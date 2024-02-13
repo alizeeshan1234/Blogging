@@ -1,0 +1,103 @@
+
+pub mod Blogging {
+    #[derive(Debug)]
+    pub struct Post {
+        pub id : u32,
+        pub title : String,
+        pub content : String,
+        pub author : String,
+        pub publication_date : String,
+        pub likes : u32,
+    }
+
+    impl Post {
+        pub fn new_post(post_id : u32 , post_title : String , post_content : String , post_author : String , post_date : String) -> Post{
+            Post {
+                id : post_id,
+                title : post_title,
+                content : post_content,
+                author : post_author,
+                publication_date : post_date,
+                likes : 0,
+            }
+        }
+
+        pub fn update_post_content(&mut self , new_content : String){
+            *&mut self.content = new_content;
+        }
+    }
+
+    #[derive(Debug)]
+    pub struct Blog {
+        pub store_posts : Vec<Post>,
+    }
+
+    impl Blog {
+        pub fn new() -> Blog {
+            Blog {
+                store_posts : Vec::new(),
+            }
+        }
+
+        pub fn add_post(&mut self , post_details : Post) {
+            self.store_posts.push(post_details);
+        }
+
+        pub fn get_post(&self , post_id : u32) -> Result<() , String> {
+            for posts in &self.store_posts {
+                if posts.id == post_id {
+                    println!("{:?}" , posts);
+                    return Ok(());
+                }else {
+                    println!("No such post found!");
+                    return Err("No such post found".to_string());
+                }
+            }
+            Err("No such post is to be founded!".to_string())
+        }
+
+        pub fn search_post_by_author(&self , author_name : String) -> Result<() , String> {
+            for posts in &self.store_posts {
+                if posts.author == author_name {
+                    println!("{:?}" , posts);
+                    return Ok(());
+                }else {
+                    return Err("No such author found!".to_string());
+                }
+            }
+            Err("No such author found!".to_string())
+        }
+
+        pub fn search_post_by_keyword(&self, key_word: &str) -> Result<(), String> {
+            let mut found = false;
+            for posts in &self.store_posts {
+                if posts.content.contains(key_word) {
+                    println!("Found Post : -- {:?}", posts);
+                    found = true;
+                }
+            }
+            if found {
+                Ok(())
+            } else {
+                println!("No posts found containing the keyword!");
+                Err("No posts found containing the keyword".to_string())
+            }
+        }
+    }
+}
+
+fn main(){
+    use crate::Blogging::*;
+
+    let mut new_blog = Blog::new();
+    let mut new_post = Post::new_post(1 , "Learning Rust".to_string() , "Learned about Rust's Traits".to_string() , "Mohammed".to_string() , "10-10-24".to_string());
+    let mut new_post_2 = Post::new_post(2 , "Gym".to_string() , "Did chest exercise".to_string() , "Ali".to_string() , "10-10-24".to_string());
+    new_post.update_post_content("Hello World".to_string());
+    new_blog.add_post(new_post);
+    new_blog.add_post(new_post_2);
+    // println!("{:?}" , new_blog);
+    let get_post = new_blog.get_post(1);
+
+    let search_post = new_blog.search_post_by_author("Mohammed".to_string());
+    new_blog.search_post_by_keyword("chest");
+}
